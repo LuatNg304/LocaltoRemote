@@ -1,6 +1,8 @@
-import { Button, Modal, Table } from "antd";
+import { Button, Form, Input, Modal, Table } from "antd";
+import { useForm } from "antd/es/form/Form";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 const ManageCategory = () => {
   //dinh nghia lay du lieu
@@ -11,6 +13,7 @@ const ManageCategory = () => {
   //2.setter
   const [categories, setCategories] = useState();
   const [open, setOpen] = useState(false);
+  const [form] = useForm();
   //muon hien thi cot columm nao
   const colums = [
     {
@@ -37,6 +40,19 @@ const ManageCategory = () => {
     console.log(response.data);
     setCategories(response.data);
   };
+
+  const handleSubmitForm = async (value) => {
+    console.log(value);
+    const response = await axios.post(
+      "https://68d1635ce6c0cbeb39a4a49e.mockapi.io/categori",
+      value
+    );
+    setOpen(false);
+    console.log(response);
+    fetchCategories();
+    form.resetFields();
+    toast.success("Succsesfully!!")
+  };
   useEffect(() => {
     //lam gi khi ma load trang len
     fetchCategories();
@@ -51,8 +67,39 @@ const ManageCategory = () => {
         title="Create new Category"
         open={open}
         onCancel={() => setOpen(false)}
+        onOk={() => form.submit()}
       >
-        abc
+        <Form
+          labelCol={{
+            span: 24,
+          }}
+          form={form}
+          onFinish={handleSubmitForm}
+        >
+          <Form.Item
+            label="Name"
+            name="name"
+            rules={[
+              { required: true, message: "Please enter your name" },
+              { min: 3, message: "Name must be at least 3 characters" },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Description"
+            name="description"
+            rules={[
+              { required: true, message: "Please enter a description" },
+              {
+                min: 10,
+                message: "Description must be at least 10 characters",
+              },
+            ]}
+          >
+            <Input.TextArea rows={5} />
+          </Form.Item>
+        </Form>
       </Modal>
     </>
   );
