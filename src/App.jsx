@@ -3,6 +3,8 @@ import Dashboard from "./component/dashboard";
 import ManageBike from "./pages/bike";
 import ManageCategory from "./pages/category";
 import { ToastContainer } from "react-toastify";
+import LoginPage from "./pages/login";
+import RegisterPage from "./pages/register";
 
 function App() {
   const router = createBrowserRouter([
@@ -19,6 +21,14 @@ function App() {
           element: <ManageCategory />, //outlet
         },
       ],
+    },
+    {
+      path:"/login",
+      element:<LoginPage/>
+    },
+    {
+      path:"/register",
+      element:<RegisterPage/>
     },
   ]);
   return (

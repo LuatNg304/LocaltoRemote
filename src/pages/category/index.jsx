@@ -1,4 +1,4 @@
-import { Button, Form, Input, Modal, Table } from "antd";
+import { Button, Form, Input, Modal, Popconfirm, Table } from "antd";
 import { useForm } from "antd/es/form/Form";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
@@ -26,6 +26,46 @@ const ManageCategory = () => {
       dataIndex: "description",
       key: "description",
     },
+    {
+      title: "Action",
+      dataIndex: "id",
+      key: "id",
+      render: (id, record) => {
+        //record :{name,description}
+        //cho phep custom cai cot trong columm
+        return (
+          <>
+            <Button
+              type="primary"
+              onClick={() => {
+                setOpen(true);
+                //fill cai oldData vao cai form
+                form.setFieldsValue(record);
+              }}
+            >
+              Edit
+            </Button>
+            <Popconfirm
+              title="Delete category"
+              onConfirm={async () => {
+                //cho phep delete
+                await axios.delete(
+                  `https://68d1635ce6c0cbeb39a4a49e.mockapi.io/categori/${id}`
+                );
+
+                fetchCategories();//cap nhat lai danh sach record
+                toast.message('SuccessFully delete!')
+                setOpen(false)
+              }}
+            >
+              <Button type="primary" danger>
+                Delete
+              </Button>
+            </Popconfirm>
+          </>
+        );
+      },
+    },
   ];
   //khi ma load trang len thi ham fetchCategories chay luon
   const fetchCategories = async () => {
@@ -41,17 +81,27 @@ const ManageCategory = () => {
     setCategories(response.data);
   };
 
-  const handleSubmitForm = async (value) => {
-    console.log(value);
-    const response = await axios.post(
-      "https://68d1635ce6c0cbeb39a4a49e.mockapi.io/categori",
-      value
-    );
+  const handleSubmitForm = async (values) => {
+    const { id } = values;
+    let response;
+
+    if (id) {
+      // => update
+      response = await axios.put(
+        `https://68d1635ce6c0cbeb39a4a49e.mockapi.io/categori/${id}`,
+        values
+      );
+    } else {
+      response = await axios.post(
+        "https://68d1635ce6c0cbeb39a4a49e.mockapi.io/categori",
+        values
+      );
+    }
     setOpen(false);
     console.log(response);
     fetchCategories();
     form.resetFields();
-    toast.success("Succsesfully!!")
+    toast.success("Succsesfully!!");
   };
   useEffect(() => {
     //lam gi khi ma load trang len
