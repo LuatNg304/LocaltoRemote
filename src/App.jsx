@@ -5,11 +5,12 @@ import ManageCategory from "./pages/category";
 import { ToastContainer } from "react-toastify";
 import LoginPage from "./pages/login";
 import RegisterPage from "./pages/register";
+import EbikeHomePage from "./pages/home";
 
 function App() {
   const router = createBrowserRouter([
     {
-      path: "/",
+      path: "/dashboard",
       element: <Dashboard />,
       children: [
         {
@@ -21,6 +22,10 @@ function App() {
           element: <ManageCategory />, //outlet
         },
       ],
+    },
+    {
+      path: "/",
+      element: <EbikeHomePage/>
     },
     {
       path:"/login",

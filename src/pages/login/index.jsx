@@ -1,212 +1,159 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import {
-  FaEnvelope,
-  FaLock,
-  FaEye,
-  FaEyeSlash,
-  FaGoogle,
-  FaGithub,
-} from "react-icons/fa";
+  Form,
+  Input,
+  Checkbox,
+  Button,
+  Card,
+  Divider,
+  Row,
+  Col,
+  message,
+} from "antd";
+import { MailOutlined, LockOutlined } from "@ant-design/icons";
+import { FaGoogle, FaGithub } from "react-icons/fa";
+import api from "../../config/axios";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+// If using AntD v5, remember to import base reset once in your app root:
+// import "antd/dist/reset.css";
 
 const LoginPage = () => {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    rememberMe: false,
-  });
-  const [errors, setErrors] = useState({});
-  const [showPassword, setShowPassword] = useState(false);
+  const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const disspath = useDispatch();
 
-  const validateForm = () => {
-    const newErrors = {};
-    if (!formData.email) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email";
-    }
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    } else if (formData.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters";
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+// 1.cap nhat => disspath
+// 2.Muon lay du lieu gte => selector
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (validateForm()) {
-      setIsLoading(true);
-      try {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-        console.log("Login successful", formData);
-      } catch (error) {
-        setErrors({ submit: "Login failed. Please try again." });
-      } finally {
-        setIsLoading(false);
-      }
-    }
-  };
+  const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
 
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
+  const onFinish = async (values) => {
+    setIsLoading(true);
+    try {
+      const response = await api.post("/login", values);
+      toast.success("Successfully create new account!");
+      console.log(response);
+      const { token } = response.data;
+      localStorage.setItem("token", token);
+
+      // lưu state
+      disspath(response.data)
+      navigate("/");
+    } catch (e) {
+      message.error("Login failed. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center relative">
+      {/* Background */}
       <div className="absolute inset-0 z-0 bg-[url('https://images.unsplash.com/photo-1571068316344-75bc76f77890?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')] bg-cover bg-center bg-no-repeat">
         <div className="absolute inset-0 bg-black/50"></div>
       </div>
 
-      <div className="max-w-md w-full space-y-8 bg-white/90 backdrop-blur-sm p-8 rounded-xl shadow-lg relative z-10 mx-4">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Welcome Back
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Sign in to your account
-          </p>
-        </div>
-
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm space-y-4">
-            <div className="relative">
-              <label htmlFor="email" className="sr-only">
-                Email address
-              </label>
-              <FaEnvelope className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className={`appearance-none rounded-lg relative block w-full pl-10 pr-3 py-2 border ${
-                  errors.email ? "border-red-300" : "border-gray-300"
-                } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-200`}
-                placeholder="Enter your email"
-                value={formData.email}
-                onChange={handleInputChange}
-              />
-              {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-              )}
-            </div>
-
-            <div className="relative">
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
-              <FaLock className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
-              <input
-                id="password"
-                name="password"
-                type={showPassword ? "text" : "password"}
-                autoComplete="current-password"
-                required
-                className={`appearance-none rounded-lg relative block w-full pl-10 pr-10 py-2 border ${
-                  errors.password ? "border-red-300" : "border-gray-300"
-                } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-200`}
-                placeholder="Enter password"
-                value={formData.password}
-                onChange={handleInputChange}
-              />
-              <button
-                type="button"
-                className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
-              </button>
-              {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password}</p>
-              )}
-            </div>
+      <div className="relative z-10 w-full max-w-md mx-4">
+        <Card style={{ borderRadius: 16 }} bodyStyle={{ padding: 24 }}>
+          <div className="text-center mb-4">
+            <h2 className="text-2xl font-bold">Welcome Back</h2>
+            <p className="text-gray-500">Sign in to your account</p>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="rememberMe"
-                type="checkbox"
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                checked={formData.rememberMe}
-                onChange={handleInputChange}
-              />
-              <label
-                htmlFor="remember-me"
-                className="ml-2 block text-sm text-gray-900"
-              >
-                Remember me
-              </label>
-            </div>
-
-            <div className="text-sm">
-              <a
-                href="#"
-                className="font-medium text-blue-600 hover:text-blue-500"
-              >
-                Forgot your password?
-              </a>
-            </div>
-          </div>
-
-          {errors.submit && (
-            <div className="rounded-md bg-red-50 p-4">
-              <p className="text-sm text-red-600">{errors.submit}</p>
-            </div>
-          )}
-
-          <div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200"
+          <Form
+            form={form}
+            layout="vertical"
+            initialValues={{ rememberMe: false }}
+            onFinish={onFinish}
+            requiredMark={false}
+          >
+            <Form.Item
+              label="Email address"
+              name="email"
+              rules={[
+                { required: true, message: "Email is required" },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    return !value || validateEmail(value)
+                      ? Promise.resolve()
+                      : Promise.reject(new Error("Please enter a valid email"));
+                  },
+                }),
+              ]}
             >
-              {isLoading ? "Signing in..." : "Sign in"}
-            </button>
-          </div>
+              <Input
+                placeholder="Enter your email"
+                type="email"
+                prefix={<MailOutlined />}
+                allowClear
+              />
+            </Form.Item>
 
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">
-                  Or continue with
-                </span>
-              </div>
-            </div>
+            <Form.Item
+              label="Password"
+              name="password"
+              rules={[
+                { required: true, message: "Password is required" },
+                { min: 8, message: "Password must be at least 8 characters" },
+              ]}
+              hasFeedback
+            >
+              <Input.Password
+                placeholder="Enter password"
+                prefix={<LockOutlined />}
+              />
+            </Form.Item>
 
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                className="w-full inline-flex justify-center py-2 px-4 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 border border-gray-300 transition duration-200"
+            <Row justify="space-between" align="middle">
+              <Col>
+                <Form.Item name="rememberMe" valuePropName="checked" noStyle>
+                  <Checkbox>Remember me</Checkbox>
+                </Form.Item>
+              </Col>
+              <Col>
+                <a href="#" onClick={(e) => e.preventDefault()}>
+                  Forgot your password?
+                </a>
+              </Col>
+            </Row>
+
+            <Form.Item style={{ marginTop: 8 }}>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={isLoading}
+                block
+                size="large"
               >
-                <FaGoogle className="mr-2 h-5 w-5 text-red-500" />
+                {isLoading ? "Signing in..." : "Sign in"}
+              </Button>
+            </Form.Item>
+
+            <Divider>Or continue with</Divider>
+
+            <div className="grid grid-cols-2 gap-3">
+              <Button
+                type="default"
+                block
+                icon={<FaGoogle />}
+                onClick={() => message.info("Google OAuth not implemented")}
+              >
                 Google
-              </button>
-              <button
-                type="button"
-                className="w-full inline-flex justify-center py-2 px-4 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 border border-gray-300 transition duration-200"
+              </Button>
+              <Button
+                type="default"
+                block
+                icon={<FaGithub />}
+                onClick={() => message.info("GitHub OAuth not implemented")}
               >
-                <FaGithub className="mr-2 h-5 w-5 text-gray-900" />
                 GitHub
-              </button>
+              </Button>
             </div>
-          </div>
-        </form>
+          </Form>
+        </Card>
       </div>
     </div>
   );
