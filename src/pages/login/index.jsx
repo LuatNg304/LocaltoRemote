@@ -16,6 +16,7 @@ import api from "../../config/axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
+import { login } from "../../redux/accountSlice";
 // If using AntD v5, remember to import base reset once in your app root:
 // import "antd/dist/reset.css";
 
@@ -23,9 +24,9 @@ const LoginPage = () => {
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const disspath = useDispatch();
+  const dispath = useDispatch();
 
-// 1.cap nhat => disspath
+// 1.cap nhat => dispath
 // 2.Muon lay du lieu gte => selector
 
   const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
@@ -34,15 +35,16 @@ const LoginPage = () => {
     setIsLoading(true);
     try {
       const response = await api.post("/login", values);
-      toast.success("Successfully create new account!");
       console.log(response);
       const { token } = response.data;
       localStorage.setItem("token", token);
-
       // lưu state
-      disspath(response.data)
+      dispath(login(response.data))
       navigate("/");
+      toast.success("Successfully login!");
     } catch (e) {
+      console.log(e);
+      
       message.error("Login failed. Please try again.");
     } finally {
       setIsLoading(false);

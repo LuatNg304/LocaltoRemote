@@ -17,7 +17,7 @@ export const accountSlice = createSlice({
   },
 })
 
-// Action creators are generated for each case reducer function
-export const {login,logout } = accountSlice.actions
 
-export default accountSlice.reducer
+export const {login,logout } = accountSlice.actions;
+
+export default accountSlice.reducer;

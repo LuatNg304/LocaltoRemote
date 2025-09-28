@@ -29,7 +29,7 @@ const { Option } = Select;
 const RegisterPage = () => {
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
+  const navigate = useNavigate();//giup chuyen trang luu hanh noi bo nhung router ma minh da setup 
 
   const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
   const validatePhone = (phone) => /^0\d{9,10}$/.test(phone);
@@ -40,9 +40,10 @@ const RegisterPage = () => {
       const response = await api.post('/register', values)
       console.log(response)
       navigate("/login");
-      toast.message("Successfully create new account!")
+      toast.success("Successfully create new account!")
       
     } catch (e) {
+      console.log(e);
       message.error("Registration failed. Please try again.");
     } finally {
       setIsLoading(false);
@@ -50,6 +51,7 @@ const RegisterPage = () => {
   };
 
   return (
+    
     <div className="min-h-screen flex items-center justify-center relative">
       {/* Background */}
       <div className="absolute inset-0 z-0 bg-[url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center bg-no-repeat">

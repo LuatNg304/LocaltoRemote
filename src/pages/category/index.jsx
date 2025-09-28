@@ -31,6 +31,7 @@ const ManageCategory = () => {
       dataIndex: "id",
       key: "id",
       render: (id, record) => {
+        //render giup tuy bien cai cot nay
         //record :{name,description}
         //cho phep custom cai cot trong columm
         return (
@@ -53,9 +54,9 @@ const ManageCategory = () => {
                   `https://68d1635ce6c0cbeb39a4a49e.mockapi.io/categori/${id}`
                 );
 
-                fetchCategories();//cap nhat lai danh sach record
-                toast.message('SuccessFully delete!')
-                setOpen(false)
+                fetchCategories(); //cap nhat lai danh sach record
+                toast.success("SuccessFully delete!");
+                setOpen(false);
               }}
             >
               <Button type="primary" danger>
@@ -96,6 +97,7 @@ const ManageCategory = () => {
         "https://68d1635ce6c0cbeb39a4a49e.mockapi.io/categori",
         values
       );
+      
     }
     setOpen(false);
     console.log(response);
@@ -126,6 +128,9 @@ const ManageCategory = () => {
           form={form}
           onFinish={handleSubmitForm}
         >
+          <Form.Item label="Id" name="id" hidden>
+            <Input />
+          </Form.Item>
           <Form.Item
             label="Name"
             name="name"
